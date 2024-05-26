@@ -1,32 +1,56 @@
 spring:
   datasource:
     dynamic:
-      primary: order
+      primary: first
       datasource:
-        order:
-          username: postgres
-          password: nknUPjQsY2uz6WST
-          url: jdbc:postgresql://110.40.253.205:5432/local
-          hikari:
-            schema: local_order
-          init:
-            schema: classpath:db/postgresql/schema-order.sql
-        account:
-          username: postgres
-          password: nknUPjQsY2uz6WST
-          url: jdbc:postgresql://110.40.253.205:5432/local
-          hikari:
-            schema: local_account
-          init:
-            schema: classpath:db/postgresql/schema-account.sql
-        product:
-          username: postgres
-          password: nknUPjQsY2uz6WST
-          url: jdbc:postgresql://110.40.253.205:5432/local
-          hikari:
-            schema: local_product
-          init:
-            schema: classpath:db/postgresql/schema-product.sql
+        first:
+          url: jdbc:p6spy:mysql://${MYSQL_HOST:172.16.0.28}:${MYSQL_PORT:3306}/phoenix_registry_${DB_ENV:test}?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=Asia/Shanghai&autoReconnect=true
+          username: ${MYSQL_USER:phoenix}
+          password: ${MYSQL_PWD:@Huatonghuhui18@}
+          driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+  data:
+    # 配置库：上报字典、接收的单号
+    mongodb:
+      first:
+        uri: mongodb://px_registry_${DB_ENV:test}:px_registry_${DB_ENV:test}@${MONGO_HOST:172.16.0.52:21017}${MONGO_RS_MEMBERS:,172.16.0.22:21017,172.16.0.47:21017}/px_registry_${DB_ENV:test}?retryWrites=false&authSource=px_registry_${DB_ENV:test}&w=majority&journal=true&wtimeoutms=5000&readPreference=primary
+      # 转换前的库：warehouse【只读副本集】
+      second:
+        uri: mongodb://px_warehouse_${DB_ENV:test}:px_warehouse_${DB_ENV:test}@${MONGO_HOST:172.16.0.52:21017}${MONGO_RS_MEMBERS:,172.16.0.22:21017,172.16.0.47:21017}/px_warehouse_${DB_ENV:test}?retryWrites=false&authSource=px_warehouse_${DB_ENV:test}&w=majority&journal=true&wtimeoutms=5000&readPreference=primary
+      # 转换后的库：目标公司库
+      three:
+        uri: mongodb://px_registry_after_${DB_ENV:test}:px_registry_after_${DB_ENV:test}@${MONGO_HOST:172.16.0.52:21017}${MONGO_RS_MEMBERS:,172.16.0.22:21017,172.16.0.47:21017}/px_registry_after_${DB_ENV:test}?retryWrites=false&authSource=px_registry_after_${DB_ENV:test}&w=majority&journal=true&wtimeoutms=5000&readPreference=primary
+      #客户中心
+      client:
+        uri: mongodb://px_customer_${DB_ENV:test}:px_customer_${DB_ENV:test}@${MONGO_HOST:172.16.0.52:21017}${MONGO_RS_MEMBERS:,172.16.0.22:21017,172.16.0.47:21017}/px_customer_${DB_ENV:test}?retryWrites=false&authSource=px_customer_${DB_ENV:test}&w=majority&journal=true&wtimeoutms=5000&readPreference=primary
+
+#        order:
+#          username: postgres
+#          password: nknUPjQsY2uz6WST
+#          url: jdbc:postgresql://110.40.253.205:5432/local
+#          hikari:
+#            schema: local_order
+#          init:
+#            schema: classpath:db/postgresql/schema-order.sql
+#        account:
+#          username: postgres
+#          password: nknUPjQsY2uz6WST
+#          url: jdbc:postgresql://110.40.253.205:5432/local
+#          hikari:
+#            schema: local_account
+#          init:
+#            schema: classpath:db/postgresql/schema-account.sql
+#        product:
+#          username: postgres
+#          password: nknUPjQsY2uz6WST
+#          url: jdbc:postgresql://110.40.253.205:5432/local
+#          hikari:
+#            schema: local_product
+#          init:
+#            schema: classpath:db/postgresql/schema-product.sql
 logging:
   level:
     com.baomidou: debug
+
+
+mybatis-plus:
+  mapper-locations: classpath:com/baomidou/samples/localtx/mapper/**/mapper/**/*Mapper.xml
